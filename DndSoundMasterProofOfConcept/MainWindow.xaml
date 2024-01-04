@@ -7,16 +7,31 @@
         mc:Ignorable="d"
         Title="Window1" Height="450" Width="800">
     <Grid>
-        <Button x:Name="playButton" Content="Play" HorizontalAlignment="Left" Margin="282,272,0,0" VerticalAlignment="Top" Width="60" Background="#FFEE9090" Click="playButton_Click">
+
+        
+        <Button x:Name="playButton" Content="Play" HorizontalAlignment="Left" Margin="305,0,0,27" VerticalAlignment="Bottom" Width="60" Background="#FFEE9090" Click="playButton_Click">
             <Button.Effect>
                 <DropShadowEffect/>
             </Button.Effect>
         </Button>
-        <Button x:Name="stopButton" Content="Stop" HorizontalAlignment="Left" Margin="524,272,0,0" VerticalAlignment="Top" Width="60" Background="#FFEE9090" Click="stopButton_Click">
+        <Button x:Name="stopButton" Content="Stop" HorizontalAlignment="Left" Margin="462,0,0,22" VerticalAlignment="Bottom" Width="60" Background="#FFEE9090" Click="stopButton_Click">
             <Button.Effect>
                 <DropShadowEffect/>
             </Button.Effect>
         </Button>
+        <Line Name ="redLine" Y1="0" Y2="96" StrokeThickness="3" Stroke="Red" Panel.ZIndex="1"></Line>
+        <Image x:Name="waveImage" Height="96" Width ="800" VerticalAlignment="Top">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+
 
     </Grid>
 </Window>
