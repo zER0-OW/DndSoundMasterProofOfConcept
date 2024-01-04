@@ -44,6 +44,7 @@ namespace DndSoundMasterProofOfConcept
             timer = new System.Threading.Timer(TimerCallback, null, 0, 100); // Adjust the period as needed
            
 
+
         }
 
         private void TimerCallback(object state)
