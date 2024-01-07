@@ -16,6 +16,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using DndSoundMasterProofOfConcept.LoopManagers;
 using NAudio.Utils;
 using NAudio.Wave;
 using NAudio.WaveFormRenderer;
@@ -42,7 +43,7 @@ namespace DndSoundMasterProofOfConcept
 
             InitializeComponent();
             timer = new System.Threading.Timer(TimerCallback, null, 0, 100); // Adjust the period as needed
-           
+
 
 
         }
@@ -63,17 +64,18 @@ namespace DndSoundMasterProofOfConcept
 
             redLine.X1 = horizontalPosition;
             redLine.X2 = horizontalPosition;
-            
+
         }
 
         private void UpdateRedLine()
         {
-            if(playing) 
+            if (playing)
             {
                 currentPosition = outputDevice.GetPositionTimeSpan();
                 UpdateRedLinePosition();
             }
         }
+     
 
         private void playButton_Click(object sender, RoutedEventArgs e)
         {
@@ -84,8 +86,7 @@ namespace DndSoundMasterProofOfConcept
             }
             if (audioFile == null)
             {
-                audioFile = new AudioFileReader(audioFilePath);
-                outputDevice.Init(audioFile);
+
                 StandardWaveFormRendererSettings myRendererSettings = new StandardWaveFormRendererSettings();
                 myRendererSettings.Width = (int)waveImage.Width;
                 myRendererSettings.TopHeight = 96;
@@ -95,19 +96,24 @@ namespace DndSoundMasterProofOfConcept
                 AveragePeakProvider averagePeakProvider = new AveragePeakProvider(4);
 
                 WaveFormRenderer renderer = new WaveFormRenderer();
-                using (var waveStream = new AudioFileReader(audioFilePath))
-                {
-                        
-                   
-                    totalTime = waveStream.TotalTime;
-                    //waveImage.Source = ImageSourceFromBitmap((Bitmap)renderer.Render(waveStream,averagePeakProvider, myRendererSettings));
-                    waveImage.Source = ConvertImageToBitmapImage(renderer.Render(waveStream, averagePeakProvider, myRendererSettings));
-                }
+                var waveStream = new AudioFileReader(audioFilePath);
+
+                LoopStream loopStream = new LoopStream(waveStream);
+
+                totalTime = waveStream.TotalTime;
+                loopStream.startTime = new TimeSpan(0, 0, 10);
+                loopStream.endTime = new TimeSpan(0, 0, 15);
+                outputDevice.Init(loopStream);
+                waveImage.Source = ConvertImageToBitmapImage(renderer.Render(waveStream, averagePeakProvider, myRendererSettings));
+
             }
+
             outputDevice.Play();
             playing = true;
 
         }
+
+
 
         private void stopButton_Click(object sender, RoutedEventArgs e)
         {
@@ -119,7 +125,6 @@ namespace DndSoundMasterProofOfConcept
         {
             outputDevice.Dispose();
             outputDevice = null;
-            audioFile.Dispose();
             audioFile = null;
             playing = false;
         }
