@@ -20,7 +20,7 @@
             </Button.Effect>
         </Button>
         <Line Name ="redLine" Y1="0" Y2="96" StrokeThickness="3" Stroke="Red" Panel.ZIndex="1"></Line>
-        <Image x:Name="waveImage" Height="96" Width ="800" VerticalAlignment="Top">
+        <Image x:Name="waveImage" Height="96" Width ="800" VerticalAlignment="Top" Stretch="Fill">
             <Image.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>

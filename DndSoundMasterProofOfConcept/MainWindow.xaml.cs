@@ -100,7 +100,8 @@ namespace DndSoundMasterProofOfConcept
                         
                    
                     totalTime = waveStream.TotalTime;
-                    waveImage.Source = ImageSourceFromBitmap((Bitmap)renderer.Render(waveStream,averagePeakProvider, myRendererSettings));
+                    //waveImage.Source = ImageSourceFromBitmap((Bitmap)renderer.Render(waveStream,averagePeakProvider, myRendererSettings));
+                    waveImage.Source = ConvertImageToBitmapImage(renderer.Render(waveStream, averagePeakProvider, myRendererSettings));
                 }
             }
             outputDevice.Play();
@@ -135,6 +136,26 @@ namespace DndSoundMasterProofOfConcept
                 return Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             }
             finally { DeleteObject(handle); }
+        }
+
+        private BitmapImage ConvertImageToBitmapImage(System.Drawing.Image image)
+        {
+            // Convert System.Drawing.Image to BitmapImage
+            BitmapImage bitmapImage = new BitmapImage();
+
+            // Create a MemoryStream and write the image data to it
+            using (System.IO.MemoryStream memoryStream = new System.IO.MemoryStream())
+            {
+                // Save the image to the MemoryStream in the desired format
+                image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+
+                // Set the BitmapImage stream source
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = new System.IO.MemoryStream(memoryStream.ToArray());
+                bitmapImage.EndInit();
+            }
+
+            return bitmapImage;
         }
     }
 
