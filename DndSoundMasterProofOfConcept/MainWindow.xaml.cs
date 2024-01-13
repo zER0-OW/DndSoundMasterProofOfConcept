@@ -30,16 +30,17 @@ namespace DndSoundMasterProofOfConcept
     /// </summary>
     public partial class Window1 : Window
     {
+        int loopIndex = 0;
         private System.Windows.Point startPoint;
         private System.Windows.Shapes.Rectangle currentRectangle;
         bool canceled;
         bool isDrawing;
         LoopStream loopStream;
-      
+        LoopSettings loopSettings = new LoopSettings();
         bool playing = false;
         private System.Threading.Timer timer;
         private double sampleRate;      // The sample rate of your audio file
-       
+        
         private TimeSpan totalTime;
         private WaveOutEvent outputDevice;
         private AudioFileReader audioFile;
@@ -50,6 +51,10 @@ namespace DndSoundMasterProofOfConcept
             InitializeComponent();
             timer = new System.Threading.Timer(TimerCallback, null, 0, 100); // Adjust the period as needed
             SetWaveImage();
+          
+            var waveStream = new AudioFileReader(audioFilePath);
+            loopStream = new LoopStream(waveStream, loopSettings);
+            totalTime = waveStream.TotalTime;
 
         }
 
@@ -79,11 +84,7 @@ namespace DndSoundMasterProofOfConcept
             if (audioFile == null)
             {
 
-                SetWaveImage();
-                var waveStream = new AudioFileReader(audioFilePath);
-               loopStream = new LoopStream(waveStream);
-
-                totalTime = waveStream.TotalTime;
+                
                 
                 outputDevice.Init(loopStream);
               
@@ -163,7 +164,7 @@ namespace DndSoundMasterProofOfConcept
             startPoint = e.GetPosition(waveImage);
             currentRectangle = new()
             {
-                Stroke = System.Windows.Media.Brushes.Red,
+                Stroke = System.Windows.Media.Brushes.DimGray,
                 StrokeThickness = 2,
                 Width = 0,
                 Height = waveImage.Height
@@ -193,8 +194,8 @@ namespace DndSoundMasterProofOfConcept
 
         private void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            isDrawing = false; 
-            Trace.WriteLine("Starttime: " + ConvertPositionIntoTime(Canvas.GetLeft(currentRectangle)) + " Endtime: " + ConvertPositionIntoTime(Canvas.GetLeft(currentRectangle) + currentRectangle.Width));
+            CreateLoopSettings();
+            isDrawing = false;
         }
 
         int ConvertTimeToPosition(TimeSpan currentTime)
@@ -210,8 +211,8 @@ namespace DndSoundMasterProofOfConcept
         }
         TimeSpan ConvertPositionIntoTime(double position)
         {
-            TimeSpan currentTime = TimeSpan.FromSeconds((double)(position * totalTime.TotalSeconds) / waveImage.Width);
-            return currentTime;
+            TimeSpan Time = TimeSpan.FromSeconds((double)(position * totalTime.TotalSeconds) / waveImage.Width);
+            return Time;
         }
 
         private void canvasOverlay_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -236,6 +237,26 @@ namespace DndSoundMasterProofOfConcept
                     rectangle.Width *= e.NewSize.Width / e.PreviousSize.Width;
                 }
             }
+        }
+
+        void CreateLoopSettings()
+        {
+            Loop tempLoop = new Loop(ConvertPositionIntoTime(Canvas.GetLeft(currentRectangle)), ConvertPositionIntoTime(Canvas.GetLeft(currentRectangle) + currentRectangle.Width));
+            loopSettings.loopList.Add(tempLoop);
+            loopStream.Settings = loopSettings;
+        }
+
+        private void nextLoopButton_Click(object sender, RoutedEventArgs e)
+        {
+            loopStream.SetLoop(loopIndex);
+            loopIndex++;
+            loopStream.EnableLooping = true;
+        }
+
+        private void resetLoopButton_Click(object sender, RoutedEventArgs e)
+        {
+            loopIndex = 0;
+            loopStream.SetLoop(loopIndex);
         }
     }
 

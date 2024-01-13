@@ -23,19 +23,24 @@ namespace DndSoundMasterProofOfConcept.LoopManagers
         /// </summary>
         /// <param name="sourceStream">The stream to read from. Note: the Read method of this stream should return 0 when it reaches the end
         /// or else we will not loop to the start again.</param>
-        public LoopStream(WaveStream sourceStream)
+        public LoopStream(WaveStream sourceStream, LoopSettings loopSettings)
         {
+            LoopSettings settings = loopSettings;
             this.sourceStream = sourceStream;
-            this.EnableLooping = true;
-            startTime = new TimeSpan(0, 0, 10);
-            endTime = new TimeSpan(0, 0, 15);
-            sourceStream.CurrentTime = startTime;
+            this.EnableLooping = false;
+            if(settings.loopList.Count > 0) 
+            {
+                currentLoop = settings.loopList[0];
+            }
+            
             
         }
 
+        public LoopSettings Settings { get; set; }
         public TimeSpan startTime { get; set; }
         public TimeSpan endTime { get; set; }
 
+        public Loop currentLoop { get; set; }
         /// <summary>
         /// Use this to turn looping on or off
         /// </summary>
@@ -74,20 +79,33 @@ namespace DndSoundMasterProofOfConcept.LoopManagers
             while (totalBytesRead < count)
             {
                 int bytesRead = sourceStream.Read(buffer, offset + totalBytesRead, count - totalBytesRead);
-                if (sourceStream.CurrentTime >= endTime)
+
+                if (EnableLooping)
                 {
-                    if (!EnableLooping)
+                    if (sourceStream.CurrentTime >= currentLoop.end)
                     {
-                        // something wrong with the source stream
-                        break;
+                        // loop
+                        sourceStream.CurrentTime = currentLoop.start;
                     }
-                    // loop
-                    sourceStream.CurrentTime = startTime;
                 }
+
+
                 totalBytesRead += bytesRead;
             }
             return totalBytesRead;
 
         }
+
+        public void SetLoop(int index)
+        {
+            if(Settings != null)
+            {
+                if (Settings.loopList.Count > index)
+                {
+                    currentLoop = Settings.loopList[index];
+                }
+            }
+        }
+        
     }
 }

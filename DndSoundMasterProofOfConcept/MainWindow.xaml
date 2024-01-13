@@ -8,18 +8,22 @@
         Title="Window1" Height="450" Width="800" SizeChanged="Window_SizeChanged" MinWidth="400">
     <Grid>
 
-
+        <Button x:Name ="nextLoopButton" Content="Next Loop" HorizontalAlignment="Left" VerticalAlignment="Top" Width="102" Click="nextLoopButton_Click" Margin="0,359,0,0"/>
         <Button x:Name="playButton" Content="Play" HorizontalAlignment="Left" Margin="340,0,0,27" VerticalAlignment="Bottom" Width="60" Background="#FFEE9090" Click="playButton_Click">
 
         </Button>
         <Button x:Name="stopButton" Content="Stop" HorizontalAlignment="Left" Margin="400,0,0,27" VerticalAlignment="Bottom" Width="60" Background="#FFEE9090" Click="stopButton_Click">
 
         </Button>
+
         <Line Name ="redLine" Y1="0" Y2="96" StrokeThickness="3" Stroke="Red" Panel.ZIndex="1"></Line>
 
         <Image x:Name="waveImage" Height="96" Width ="800" VerticalAlignment="Top" Stretch="Fill"  MouseLeftButtonDown="waveImage_MouseLeftButtonDown" MouseMove="waveImage_MouseMove" ></Image>
 
-        <Canvas x:Name="canvasOverlay" MouseLeftButtonUp="Image_MouseLeftButtonUp" MouseRightButtonDown="canvasOverlay_MouseRightButtonDown"/>
+        <Canvas x:Name="canvasOverlay" MouseLeftButtonUp="Image_MouseLeftButtonUp" MouseRightButtonDown="canvasOverlay_MouseRightButtonDown">
+
+        </Canvas>
+        <Button x:Name ="resetLoopButton" Content="Reset Loop" HorizontalAlignment="Left" VerticalAlignment="Top" Width="102"  Margin="0,382,0,0" RenderTransformOrigin="0.474,1.93" Click="resetLoopButton_Click"/>
 
 
 
