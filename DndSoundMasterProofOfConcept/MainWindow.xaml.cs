@@ -155,6 +155,7 @@ namespace DndSoundMasterProofOfConcept
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             waveImage.Width = Width;
+            ResizeRectangles(e);
         }
 
         private void waveImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -217,6 +218,24 @@ namespace DndSoundMasterProofOfConcept
         {
             isDrawing = false;
             canvasOverlay.Children.Remove(currentRectangle); 
+        }
+
+        void ResizeRectangles(SizeChangedEventArgs e)
+        {
+            foreach (UIElement element in canvasOverlay.Children)
+            {
+                if (element is System.Windows.Shapes.Rectangle rectangle)
+                {
+                    // Update rectangle positions based on the new window size
+                    double left = Canvas.GetLeft(rectangle) / e.PreviousSize.Width * e.NewSize.Width;
+                    double top = Canvas.GetTop(rectangle) / e.PreviousSize.Height * e.NewSize.Height;
+
+                    Canvas.SetLeft(rectangle, left);
+                    Canvas.SetTop(rectangle, top);
+
+                    rectangle.Width *= e.NewSize.Width / e.PreviousSize.Width;
+                }
+            }
         }
     }
 
