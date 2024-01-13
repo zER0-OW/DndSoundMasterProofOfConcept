@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -29,12 +30,16 @@ namespace DndSoundMasterProofOfConcept
     /// </summary>
     public partial class Window1 : Window
     {
+        private System.Windows.Point startPoint;
+        private System.Windows.Shapes.Rectangle currentRectangle;
+        bool canceled;
+        bool isDrawing;
         LoopStream loopStream;
-        int waveFormRendererWidth;
+      
         bool playing = false;
         private System.Threading.Timer timer;
         private double sampleRate;      // The sample rate of your audio file
-        private TimeSpan currentPosition;
+       
         private TimeSpan totalTime;
         private WaveOutEvent outputDevice;
         private AudioFileReader audioFile;
@@ -44,8 +49,7 @@ namespace DndSoundMasterProofOfConcept
 
             InitializeComponent();
             timer = new System.Threading.Timer(TimerCallback, null, 0, 100); // Adjust the period as needed
-
-
+            SetWaveImage();
 
         }
 
@@ -60,11 +64,7 @@ namespace DndSoundMasterProofOfConcept
         {
             if(playing) 
             {
-                double currentTimeInSeconds = loopStream.CurrentTime.TotalSeconds;
-                int horizontalPosition = (int)((currentTimeInSeconds / totalTime.TotalSeconds) * waveImage.Width);
-
-                redLine.X1 = horizontalPosition;
-                redLine.X2 = horizontalPosition;
+                redLine.X1 = redLine.X2 = ConvertTimeToPosition(loopStream.CurrentTime);
             }
         }
      
@@ -103,7 +103,7 @@ namespace DndSoundMasterProofOfConcept
             myRendererSettings.TopHeight = 96;
             myRendererSettings.BottomHeight = 96;
             myRendererSettings.PixelsPerPeak = 1;
-            waveFormRendererWidth = myRendererSettings.Width;
+         
             AveragePeakProvider averagePeakProvider = new AveragePeakProvider(4);
 
             WaveFormRenderer renderer = new WaveFormRenderer();
@@ -155,6 +155,68 @@ namespace DndSoundMasterProofOfConcept
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             waveImage.Width = Width;
+        }
+
+        private void waveImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            startPoint = e.GetPosition(waveImage);
+            currentRectangle = new()
+            {
+                Stroke = System.Windows.Media.Brushes.Red,
+                StrokeThickness = 2,
+                Width = 0,
+                Height = waveImage.Height
+            };
+
+            Canvas.SetLeft(currentRectangle, startPoint.X);
+            Canvas.SetTop(currentRectangle,0);
+
+            canvasOverlay.Children.Add(currentRectangle);
+            isDrawing = true;
+        }
+
+        private void waveImage_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (isDrawing)
+            {
+                
+                System.Windows.Point currentPoint = e.GetPosition(waveImage);
+
+                double width = currentPoint.X - startPoint.X;
+                
+
+                currentRectangle.Width = Math.Max(0, width);
+               
+            }
+        }
+
+        private void Image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            isDrawing = false; 
+            Trace.WriteLine("Starttime: " + ConvertPositionIntoTime(Canvas.GetLeft(currentRectangle)) + " Endtime: " + ConvertPositionIntoTime(Canvas.GetLeft(currentRectangle) + currentRectangle.Width));
+        }
+
+        int ConvertTimeToPosition(TimeSpan currentTime)
+        {
+            int horizontalPosition = (int)((currentTime.TotalSeconds/ totalTime.TotalSeconds) * waveImage.Width);
+
+            return horizontalPosition;
+        }
+
+        TimeSpan ConvertPositionIntoTime(int position)
+        {
+            return ConvertPositionIntoTime((double)position);
+        }
+        TimeSpan ConvertPositionIntoTime(double position)
+        {
+            TimeSpan currentTime = TimeSpan.FromSeconds((double)(position * totalTime.TotalSeconds) / waveImage.Width);
+            return currentTime;
+        }
+
+        private void canvasOverlay_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            isDrawing = false;
+            canvasOverlay.Children.Remove(currentRectangle); 
         }
     }
 
