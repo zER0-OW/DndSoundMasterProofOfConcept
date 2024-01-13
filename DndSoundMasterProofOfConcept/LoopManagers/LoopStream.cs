@@ -27,7 +27,10 @@ namespace DndSoundMasterProofOfConcept.LoopManagers
         {
             this.sourceStream = sourceStream;
             this.EnableLooping = true;
+            startTime = new TimeSpan(0, 0, 10);
+            endTime = new TimeSpan(0, 0, 15);
             sourceStream.CurrentTime = startTime;
+            
         }
 
         public TimeSpan startTime { get; set; }
@@ -71,9 +74,9 @@ namespace DndSoundMasterProofOfConcept.LoopManagers
             while (totalBytesRead < count)
             {
                 int bytesRead = sourceStream.Read(buffer, offset + totalBytesRead, count - totalBytesRead);
-                if (sourceStream.CurrentTime == endTime)
+                if (sourceStream.CurrentTime >= endTime)
                 {
-                    if (sourceStream.CurrentTime == startTime || !EnableLooping)
+                    if (!EnableLooping)
                     {
                         // something wrong with the source stream
                         break;

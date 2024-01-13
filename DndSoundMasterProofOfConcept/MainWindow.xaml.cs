@@ -29,6 +29,7 @@ namespace DndSoundMasterProofOfConcept
     /// </summary>
     public partial class Window1 : Window
     {
+        LoopStream loopStream;
         int waveFormRendererWidth;
         bool playing = false;
         private System.Threading.Timer timer;
@@ -53,26 +54,17 @@ namespace DndSoundMasterProofOfConcept
             Dispatcher.Invoke(() => UpdateRedLine());
         }
 
-        private void UpdateRedLinePosition()
-        {
-
-
-            double currentTimeInSeconds = outputDevice.GetPositionTimeSpan().TotalSeconds;
-
-            // Convert playback position to pixel position
-            int horizontalPosition = (int)((currentTimeInSeconds / totalTime.TotalSeconds) * waveFormRendererWidth);
-
-            redLine.X1 = horizontalPosition;
-            redLine.X2 = horizontalPosition;
-
-        }
+    
 
         private void UpdateRedLine()
         {
-            if (playing)
+            if(playing) 
             {
-                currentPosition = outputDevice.GetPositionTimeSpan();
-                UpdateRedLinePosition();
+                double currentTimeInSeconds = loopStream.CurrentTime.TotalSeconds;
+                int horizontalPosition = (int)((currentTimeInSeconds / totalTime.TotalSeconds) * waveImage.Width);
+
+                redLine.X1 = horizontalPosition;
+                redLine.X2 = horizontalPosition;
             }
         }
      
@@ -87,24 +79,14 @@ namespace DndSoundMasterProofOfConcept
             if (audioFile == null)
             {
 
-                StandardWaveFormRendererSettings myRendererSettings = new StandardWaveFormRendererSettings();
-                myRendererSettings.Width = (int)waveImage.Width;
-                myRendererSettings.TopHeight = 96;
-                myRendererSettings.BottomHeight = 96;
-                myRendererSettings.PixelsPerPeak = 1;
-                waveFormRendererWidth = myRendererSettings.Width;
-                AveragePeakProvider averagePeakProvider = new AveragePeakProvider(4);
-
-                WaveFormRenderer renderer = new WaveFormRenderer();
+                SetWaveImage();
                 var waveStream = new AudioFileReader(audioFilePath);
-
-                LoopStream loopStream = new LoopStream(waveStream);
+               loopStream = new LoopStream(waveStream);
 
                 totalTime = waveStream.TotalTime;
-                loopStream.startTime = new TimeSpan(0, 0, 10);
-                loopStream.endTime = new TimeSpan(0, 0, 15);
+                
                 outputDevice.Init(loopStream);
-                waveImage.Source = ConvertImageToBitmapImage(renderer.Render(waveStream, averagePeakProvider, myRendererSettings));
+              
 
             }
 
@@ -113,6 +95,26 @@ namespace DndSoundMasterProofOfConcept
 
         }
 
+        private void SetWaveImage()
+        {
+            var waveStream = new AudioFileReader(audioFilePath);
+            StandardWaveFormRendererSettings myRendererSettings = new StandardWaveFormRendererSettings();
+            myRendererSettings.Width = Screen.PrimaryScreen.Bounds.Width;
+            myRendererSettings.TopHeight = 96;
+            myRendererSettings.BottomHeight = 96;
+            myRendererSettings.PixelsPerPeak = 1;
+            waveFormRendererWidth = myRendererSettings.Width;
+            AveragePeakProvider averagePeakProvider = new AveragePeakProvider(4);
+
+            WaveFormRenderer renderer = new WaveFormRenderer();
+
+            waveImage.Source = ConvertImageToBitmapImage(renderer.Render(waveStream, averagePeakProvider, myRendererSettings));
+            waveStream.Dispose();
+            waveStream = null;
+
+
+
+        }
 
 
         private void stopButton_Click(object sender, RoutedEventArgs e)
@@ -129,19 +131,6 @@ namespace DndSoundMasterProofOfConcept
             playing = false;
         }
 
-        [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool DeleteObject([In] IntPtr hObject);
-
-        public ImageSource ImageSourceFromBitmap(Bitmap bmp)
-        {
-            var handle = bmp.GetHbitmap();
-            try
-            {
-                return Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            }
-            finally { DeleteObject(handle); }
-        }
 
         private BitmapImage ConvertImageToBitmapImage(System.Drawing.Image image)
         {
@@ -161,6 +150,11 @@ namespace DndSoundMasterProofOfConcept
             }
 
             return bitmapImage;
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            waveImage.Width = Width;
         }
     }
 
