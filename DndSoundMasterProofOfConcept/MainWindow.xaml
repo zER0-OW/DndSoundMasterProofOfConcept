@@ -1,27 +1,24 @@
-﻿<Window x:Class="DndSoundMasterProofOfConcept.Window1"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DndSoundMasterProofOfConcept"
+        xmlns:CustomControls="clr-namespace:DndSoundMasterProofOfConcept.CustomControls" x:Class="DndSoundMasterProofOfConcept.Window1"
         mc:Ignorable="d"
         Title="Window1" Height="450" Width="800" SizeChanged="Window_SizeChanged" MinWidth="400">
     <Grid>
 
         <Button x:Name ="nextLoopButton" Content="Next Loop" HorizontalAlignment="Left" VerticalAlignment="Top" Width="102" Click="nextLoopButton_Click" Margin="0,359,0,0"/>
-        <Button x:Name="playButton" Content="Play" HorizontalAlignment="Left" Margin="340,0,0,27" VerticalAlignment="Bottom" Width="60" Background="#FFEE9090" Click="playButton_Click">
+        <Button x:Name="playButton" Content="Play" HorizontalAlignment="Left" Margin="340,0,0,27" VerticalAlignment="Bottom" Width="60" Background="#FFEE9090" Click="playButton_Click"/>
+        <Button x:Name="stopButton" Content="Stop" HorizontalAlignment="Left" Margin="400,0,0,27" VerticalAlignment="Bottom" Width="60" Background="#FFEE9090" Click="stopButton_Click"/>
 
-        </Button>
-        <Button x:Name="stopButton" Content="Stop" HorizontalAlignment="Left" Margin="400,0,0,27" VerticalAlignment="Bottom" Width="60" Background="#FFEE9090" Click="stopButton_Click">
+        <Line x:Name ="redLine" Y1="0" Y2="96" StrokeThickness="3" Stroke="Red" Panel.ZIndex="1"/>
 
-        </Button>
-
-        <Line Name ="redLine" Y1="0" Y2="96" StrokeThickness="3" Stroke="Red" Panel.ZIndex="1"></Line>
-
-        <Image x:Name="waveImage" Height="96" Width ="800" VerticalAlignment="Top" Stretch="Fill"  MouseLeftButtonDown="waveImage_MouseLeftButtonDown" MouseMove="waveImage_MouseMove" ></Image>
+        <Image x:Name="waveImage" Height="96" Width ="800" VerticalAlignment="Top" Stretch="Fill"  MouseLeftButtonDown="waveImage_MouseLeftButtonDown" MouseMove="waveImage_MouseMove" />
 
         <Canvas x:Name="canvasOverlay" MouseLeftButtonUp="Image_MouseLeftButtonUp" MouseRightButtonDown="canvasOverlay_MouseRightButtonDown">
-
+            <CustomControls:TimeLine x:Name="timeLine" Canvas.Top="111"/>
         </Canvas>
         <Button x:Name ="resetLoopButton" Content="Reset Loop" HorizontalAlignment="Left" VerticalAlignment="Top" Width="102"  Margin="0,382,0,0" RenderTransformOrigin="0.474,1.93" Click="resetLoopButton_Click"/>
 

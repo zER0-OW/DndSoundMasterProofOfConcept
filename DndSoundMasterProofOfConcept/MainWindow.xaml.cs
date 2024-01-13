@@ -55,6 +55,7 @@ namespace DndSoundMasterProofOfConcept
             var waveStream = new AudioFileReader(audioFilePath);
             loopStream = new LoopStream(waveStream, loopSettings);
             totalTime = waveStream.TotalTime;
+            timeLine.InitiateTimeLabels(6, totalTime);
 
         }
 
@@ -157,6 +158,7 @@ namespace DndSoundMasterProofOfConcept
         {
             waveImage.Width = Width;
             ResizeRectangles(e);
+            timeLine.ResizeLabels(Width);
         }
 
         private void waveImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
