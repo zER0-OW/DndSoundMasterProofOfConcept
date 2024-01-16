@@ -44,7 +44,7 @@ namespace DndSoundMasterProofOfConcept
         private TimeSpan totalTime;
         private WaveOutEvent outputDevice;
         private AudioFileReader audioFile;
-        string audioFilePath = @"C:\Users\Mo\Downloads\01. Elden Ring.mp3";
+        string audioFilePath = @"C:\Users\Mo\Downloads\54. Mohg, Lord of Blood.mp3";
         public Window1()
         {
 

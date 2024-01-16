@@ -16,6 +16,7 @@ namespace DndSoundMasterProofOfConcept.LoopManagers
     /// </summary>
     public class LoopStream : WaveStream
     {
+        
         WaveStream sourceStream;
 
         /// <summary>
@@ -27,18 +28,22 @@ namespace DndSoundMasterProofOfConcept.LoopManagers
         {
             LoopSettings settings = loopSettings;
             this.sourceStream = sourceStream;
-            this.EnableLooping = false;
+            this.EnableLooping = true;
+            defaultLoop = new Loop (new TimeSpan (0,0,0), sourceStream.TotalTime);
             if(settings.loopList.Count > 0) 
             {
                 currentLoop = settings.loopList[0];
             }
-            
-            
+            else
+                currentLoop = defaultLoop;
+           
+
+
         }
 
         public LoopSettings Settings { get; set; }
-        public TimeSpan startTime { get; set; }
-        public TimeSpan endTime { get; set; }
+
+        public Loop defaultLoop;
 
         public Loop currentLoop { get; set; }
         /// <summary>
@@ -73,7 +78,10 @@ namespace DndSoundMasterProofOfConcept.LoopManagers
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-
+            if(currentLoop == null)
+            {
+                
+            }
             int totalBytesRead = 0;
 
             while (totalBytesRead < count)
